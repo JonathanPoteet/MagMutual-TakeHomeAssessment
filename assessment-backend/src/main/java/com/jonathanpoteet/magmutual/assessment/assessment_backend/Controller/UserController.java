@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.jonathanpoteet.magmutual.assessment.assessment_backend.Model.User;
 import com.jonathanpoteet.magmutual.assessment.assessment_backend.Service.UserService;
 
 @RestController
@@ -26,23 +27,23 @@ public class UserController {
     }
     // GET /api/users - Retrieve all users
     @GetMapping("/users")
-    public ResponseEntity<List<Map<String, Object>>> getUsers() {
+    public ResponseEntity<List<User>> getUsers() {
         return ResponseEntity.ok(userService.getUsers());
     }
 
     // GET /api/users/{id} - Retrieve a user by ID
     @GetMapping("/users/{id}")
-    public ResponseEntity<Map<String, Object>> getUserById(@PathVariable int id) {
-        Map<String, Object> user = userService.getUserById(id);
-        return user.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(user);
+    public ResponseEntity<User> getUserById(@PathVariable int id) {
+        User user = userService.getUserById(id);
+        return user == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(user);
     }
 
     // Optional:
     // 1. Ability to create and delete users
     @PostMapping("/users")
-    public ResponseEntity<Map<String, Object>> createUser(@RequestBody Map<String, Object> userData) {
-        Map<String, Object> createdUser = userService.createUser(userData);
-        if (createdUser == null || createdUser.isEmpty()) {
+    public ResponseEntity<User> createUser(@RequestBody User user) {
+        User createdUser = userService.createUser(user);
+        if (createdUser == null) {
             return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);

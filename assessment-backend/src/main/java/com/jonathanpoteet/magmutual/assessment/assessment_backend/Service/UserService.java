@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import com.jonathanpoteet.magmutual.assessment.assessment_backend.Model.User;
 import com.jonathanpoteet.magmutual.assessment.assessment_backend.Repository.UserRepository;
 
 @Service
@@ -16,20 +17,25 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public List<Map<String, Object>> getUsers() {
-        return userRepository.findAll();
+    public List<User> getUsers() {
+        return userRepository.findAll()
+            .stream()
+            .map(User::fromMap)
+            .toList();
     }
 
-    public Map<String, Object> getUserById(int id) {
-        return userRepository.findById(id);
+    public User getUserById(int id) {
+        Map<String, Object> userData = userRepository.findById(id);
+        return userData.isEmpty() ? null : User.fromMap(userData);
     }
 
-    public Map<String, Object> createUser(Map<String, Object> userData) {
-        if (userData == null || userData.isEmpty()) {
-            return Map.of();
+    public User createUser(User user) {
+        if (user == null) {
+            return null;
         }
 
-        return userRepository.create(userData);
+        Map<String, Object> createdUser = userRepository.create(user.toMap());
+        return createdUser == null || createdUser.isEmpty() ? null : User.fromMap(createdUser);
     }
 
     public boolean deleteUserById(int id) {
