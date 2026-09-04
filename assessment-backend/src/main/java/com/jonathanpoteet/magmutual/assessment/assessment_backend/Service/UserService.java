@@ -23,4 +23,17 @@ public class UserService {
     public Map<String, Object> getUserById(int id) {
         return userRepository.findById(id);
     }
+
+    public Map<String, Object> createUser(Map<String, Object> userData) {
+        if (userData == null || userData.isEmpty()) {
+            return Map.of();
+        }
+
+        return userRepository.create(userData);
+    }
+
+    public boolean deleteUserById(int id) {
+        return userRepository.deleteById(id);
+    }
+
 }
