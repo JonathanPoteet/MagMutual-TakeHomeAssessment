@@ -1,9 +1,13 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import App from './App';
 
-test('renders learn react link', () => {
+test('renders the user table and sorts by email when requested', () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+
+  expect(screen.getByRole('heading', { name: /user list/i })).toBeInTheDocument();
+
+  const emailHeader = screen.getByRole('button', { name: /email/i });
+  fireEvent.click(emailHeader);
+
 });
