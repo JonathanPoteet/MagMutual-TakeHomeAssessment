@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import com.jonathanpoteet.magmutual.assessment.assessment_backend.Model.RecentSignups;
 import com.jonathanpoteet.magmutual.assessment.assessment_backend.Model.User;
 import com.jonathanpoteet.magmutual.assessment.assessment_backend.Repository.UserRepository;
 
@@ -71,4 +72,16 @@ public class UserService {
         return true;
     }
 
+
+    public List<RecentSignups> getTrends() {
+        return getUsers().stream()
+        .sorted((u1, u2) -> u2.getDateCreated().compareTo(u1.getDateCreated()))
+        .limit(25)
+        .map(u -> new RecentSignups(
+            u.getDateCreated(),
+            u.getCity(),
+            u.getProfession()
+        ))
+        .toList();
+    }
 }

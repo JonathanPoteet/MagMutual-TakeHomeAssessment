@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.jonathanpoteet.magmutual.assessment.assessment_backend.Model.RecentSignups;
 import com.jonathanpoteet.magmutual.assessment.assessment_backend.Model.User;
 import com.jonathanpoteet.magmutual.assessment.assessment_backend.Service.UserService;
 
@@ -49,6 +50,12 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@PathVariable int id) {
         userService.deleteUserById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // An endpoint to get the recent signups trends, returning the 25 most recent signups
+    @GetMapping("/users/trends")
+    public ResponseEntity<List<RecentSignups>> getTrends() {
+        return ResponseEntity.ok(userService.getTrends());
     }
 
     // Additionally, you can implement an update endpoint if needed:
