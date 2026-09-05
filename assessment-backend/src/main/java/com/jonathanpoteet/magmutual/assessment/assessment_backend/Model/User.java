@@ -1,7 +1,5 @@
 package com.jonathanpoteet.magmutual.assessment.assessment_backend.Model;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -99,40 +97,4 @@ public class User {
         this.city = city;
     }
 
-    public Map<String, Object> toMap() {
-        Map<String, Object> values = new LinkedHashMap<>();
-        values.put("firstname", firstname);
-        values.put("lastname", lastname);
-        values.put("email", email);
-        values.put("profession", profession);
-        values.put("dateCreated", dateCreated);
-        values.put("country", country);
-        values.put("city", city);
-        return values;
-    }
-
-    public static User fromMap(Map<String, Object> source) {
-        if (source == null || source.isEmpty()) {
-            return new User();
-        }
-
-        User user = new User();
-        Object idValue = source.get("id");
-        if (idValue != null) {
-            try {
-                user.setId(Integer.parseInt(String.valueOf(idValue)));
-            } catch (NumberFormatException ignored) {
-                // ignore invalid ID during mapping
-            }
-        }
-
-        user.setFirstname(String.valueOf(source.getOrDefault("firstname", "")));
-        user.setLastname(String.valueOf(source.getOrDefault("lastname", "")));
-        user.setEmail(String.valueOf(source.getOrDefault("email", "")));
-        user.setProfession(String.valueOf(source.getOrDefault("profession", "")));
-        user.setDateCreated(String.valueOf(source.getOrDefault("dateCreated", "")));
-        user.setCountry(String.valueOf(source.getOrDefault("country", "")));
-        user.setCity(String.valueOf(source.getOrDefault("city", "")));
-        return user;
-    }
 }

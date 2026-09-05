@@ -34,8 +34,7 @@ public class UserController {
     // GET /api/users/{id} - Retrieve a user by ID
     @GetMapping("/users/{id}")
     public ResponseEntity<User> getUserById(@PathVariable int id) {
-        User user = userService.getUserById(id);
-        return user == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(user);
+        return ResponseEntity.ok(userService.getUserById(id));
     }
 
     // Optional:
@@ -43,16 +42,13 @@ public class UserController {
     @PostMapping("/users")
     public ResponseEntity<User> createUser(@RequestBody User user) {
         User createdUser = userService.createUser(user);
-        if (createdUser == null) {
-            return ResponseEntity.badRequest().build();
-        }
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
     @DeleteMapping("/users/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable int id) {
-        boolean deleted = userService.deleteUserById(id);
-        return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+        userService.deleteUserById(id);
+        return ResponseEntity.noContent().build();
     }
 
     // Additionally, you can implement an update endpoint if needed:

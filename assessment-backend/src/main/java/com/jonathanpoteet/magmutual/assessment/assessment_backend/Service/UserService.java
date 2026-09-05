@@ -18,28 +18,57 @@ public class UserService {
     }
 
     public List<User> getUsers() {
-        return userRepository.findAll()
-            .stream()
-            .map(User::fromMap)
-            .toList();
+        List<User> users = userRepository.findAll();
+        if (users == null) {
+            throw new IllegalArgumentException("No users found");
+        }
+        return users;
     }
 
     public User getUserById(int id) {
-        Map<String, Object> userData = userRepository.findById(id);
-        return userData.isEmpty() ? null : User.fromMap(userData);
+        User user = userRepository.findById(id);
+        if (user == null) {
+            throw new IllegalArgumentException("User not found");
+        }
+        return user;
     }
 
+    // More Validation could be added here for other fields like Profession, Country, City, etc. based on requirements.
     public User createUser(User user) {
         if (user == null) {
-            return null;
+            throw new IllegalArgumentException("User is required");
         }
 
-        Map<String, Object> createdUser = userRepository.create(user.toMap());
-        return createdUser == null || createdUser.isEmpty() ? null : User.fromMap(createdUser);
+        if (user.getFirstname() == null || user.getFirstname().trim().isEmpty()) {
+            throw new IllegalArgumentException("Missing first name");
+        }
+
+        if (user.getLastname() == null || user.getLastname().trim().isEmpty()) {
+            throw new IllegalArgumentException("Missing last name");
+        }
+
+        if (user.getEmail() == null || user.getEmail().trim().isEmpty()) {
+            throw new IllegalArgumentException("Missing email");
+        }
+
+        String email = user.getEmail().trim();
+        if (!email.matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")) {
+            throw new IllegalArgumentException("Invalid email");
+        }
+
+        user.setFirstname(user.getFirstname().trim());
+        user.setLastname(user.getLastname().trim());
+        user.setEmail(email);
+
+        return userRepository.create(user);
     }
 
     public boolean deleteUserById(int id) {
-        return userRepository.deleteById(id);
+        boolean deleted = userRepository.deleteById(id);
+        if (!deleted) {
+            throw new IllegalArgumentException("User not found");
+        }
+        return true;
     }
 
 }

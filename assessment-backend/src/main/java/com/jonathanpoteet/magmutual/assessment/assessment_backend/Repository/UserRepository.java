@@ -3,14 +3,17 @@ package com.jonathanpoteet.magmutual.assessment.assessment_backend.Repository;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 import javax.sql.DataSource;
 
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
+import com.jonathanpoteet.magmutual.assessment.assessment_backend.Model.User;
 import com.jonathanpoteet.magmutual.assessment.assessment_backend.StartupHelper.StartupHelperService;
 
 @Repository
@@ -25,31 +28,31 @@ public class UserRepository {
         initializeDatabase();
     }
 
-    public List<Map<String, Object>> findAll() {
+    public List<User> findAll() {
         String sql = "SELECT id, firstname, lastname, email, profession, dateCreated, country, city FROM users ORDER BY id";
-        return jdbcTemplate.queryForList(sql);
+        return jdbcTemplate.query(sql, new UserRowMapper());
     }
 
-    public Map<String, Object> findById(int id) {
+    public User findById(int id) {
         String sql = "SELECT id, firstname, lastname, email, profession, dateCreated, country, city FROM users WHERE id = ?";
-        List<Map<String, Object>> users = jdbcTemplate.queryForList(sql, id);
-        return users.isEmpty() ? Map.of() : users.get(0);
+        List<User> users = jdbcTemplate.query(sql, new UserRowMapper(), id);
+        return users.isEmpty() ? null : users.get(0);
     }
 
-    public Map<String, Object> create(Map<String, Object> userData) {
+    public User create(User user) {
         String sql = "INSERT INTO users (firstname, lastname, email, profession, dateCreated, country, city) VALUES (?, ?, ?, ?, ?, ?, ?)";
         int result = jdbcTemplate.update(sql,
-            userData.getOrDefault("firstname", ""),
-            userData.getOrDefault("lastname", ""),
-            userData.getOrDefault("email", ""),
-            userData.getOrDefault("profession", ""),
-            userData.getOrDefault("dateCreated", ""),
-            userData.getOrDefault("country", ""),
-            userData.getOrDefault("city", "")
+            user.getFirstname(),
+            user.getLastname(),
+            user.getEmail(),
+            user.getProfession(),
+            user.getDateCreated(),
+            user.getCountry(),
+            user.getCity()
         );
 
         if (result == 0) {
-            return Map.of();
+            return null;
         }
 
         Integer generatedId = jdbcTemplate.queryForObject("SELECT last_insert_rowid()", Integer.class);
@@ -59,6 +62,23 @@ public class UserRepository {
     public boolean deleteById(int id) {
         String sql = "DELETE FROM users WHERE id = ?";
         return jdbcTemplate.update(sql, id) > 0;
+    }
+
+    private static final class UserRowMapper implements RowMapper<User> {
+        @Override
+        public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+            User user = new User();
+            //this is mapping the information from the database to the User object
+            user.setId(rs.getInt("id"));
+            user.setFirstname(rs.getString("firstname"));
+            user.setLastname(rs.getString("lastname"));
+            user.setEmail(rs.getString("email"));
+            user.setProfession(rs.getString("profession"));
+            user.setDateCreated(rs.getString("dateCreated"));
+            user.setCountry(rs.getString("country"));
+            user.setCity(rs.getString("city"));
+            return user;
+        }
     }
 
     private void initializeDatabase() {
