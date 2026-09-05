@@ -1,7 +1,6 @@
 package com.jonathanpoteet.magmutual.assessment.assessment_backend.Service;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
@@ -19,6 +18,11 @@ public class UserService {
     }
 
     public List<User> getUsers() {
+        /* 
+        this dataset could be cached in memory for performance
+        but it depends on the size, update frequency, and
+        security requirements.
+        */
         List<User> users = userRepository.findAll();
         if (users == null) {
             throw new IllegalArgumentException("No users found");
@@ -74,6 +78,16 @@ public class UserService {
 
 
     public List<RecentSignups> getTrends() {
+        /* 
+        Since getUsers is already planned to be called and this is currently 
+        a small dataset, we can sort and limit the results here. 
+        In a real-world scenario, this can be done in another database 
+        query for efficiency or on a cached dataset.
+
+        This also depends on the type of data that is being handled.
+        If it is sensitive data, we might be more cautious about
+        caching or storing it in memory depending on the security requirements.
+        */
         return getUsers().stream()
         .sorted((u1, u2) -> u2.getDateCreated().compareTo(u1.getDateCreated()))
         .limit(25)

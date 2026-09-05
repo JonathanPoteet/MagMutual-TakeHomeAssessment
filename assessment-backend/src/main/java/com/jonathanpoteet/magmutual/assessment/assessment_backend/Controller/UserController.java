@@ -65,5 +65,8 @@ public class UserController {
     /* this will be handled on the client side (frontend) for this assessment, but 
     in a real-world scenario, you can implement filtering, sorting, and searching on 
     the backend as well for reasons such as pagination for large datasets.
+
+    filter, sorting, and search can be much more costly on the frontend if the dataset grows larger.
+
     */
     }

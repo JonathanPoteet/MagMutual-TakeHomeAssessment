@@ -28,6 +28,8 @@ public class StartupHelperService {
     }
 
     public void seedDataIfEmpty() {
+        // this is built of the assumption that the CSV file contains data that is validated and ready to be inserted into the database. 
+        // If the CSV file is not validated, you should add validation logic here.
         Integer count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM users", Integer.class);
         if (count != null && count > 0) {
             return;
@@ -37,7 +39,6 @@ public class StartupHelperService {
         if (Files.notExists(csvPath)) {
             return;
         }
-
         List<Map<String, Object>> users = loadUsersFromCsv(csvPath);
         if (users.isEmpty()) {
             return;
