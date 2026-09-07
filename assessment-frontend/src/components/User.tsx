@@ -207,6 +207,19 @@ export default function UserPage() {
                     <td>{user.email}</td>
                     <td>{user.city}</td>
                     <td>{user.profession}</td>
+                    <td>
+                      <button
+                        type="button"
+                        className="delete-button"
+                        aria-label={`Delete ${user.firstname} ${user.lastname}`}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          console.log('Delete user', user.id);
+                        }}
+                      >
+                        <span className="material-symbols-outlined" aria-hidden="true">delete</span>
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>

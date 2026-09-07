@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0');
+
 .App {
   text-align: center;
 }
@@ -126,19 +128,47 @@
 }
 
 .user-table th:nth-child(1),
-.user-table td:nth-child(1) { width: 18%; }
+.user-table td:nth-child(1) { width: 16%; }
 
 .user-table th:nth-child(2),
-.user-table td:nth-child(2) { width: 18%; }
+.user-table td:nth-child(2) { width: 16%; }
 
 .user-table th:nth-child(3),
-.user-table td:nth-child(3) { width: 28%; }
+.user-table td:nth-child(3) { width: 22%; }
 
 .user-table th:nth-child(4),
-.user-table td:nth-child(4) { width: 18%; }
+.user-table td:nth-child(4) { width: 16%; }
 
 .user-table th:nth-child(5),
-.user-table td:nth-child(5) { width: 18%; }
+.user-table td:nth-child(5) { width: 16%; }
+
+.user-table th:nth-child(6),
+.user-table td:nth-child(6) { width: 14%; min-width: 120px; text-align: center; }
+
+.delete-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.delete-button:hover {
+  background: #fee2e2;
+  border-color: #fca5a5;
+}
+
+.delete-button .material-symbols-outlined {
+  font-size: 1.25rem;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  line-height: 1;
+}
 
 .sort-button {
   background: transparent;
