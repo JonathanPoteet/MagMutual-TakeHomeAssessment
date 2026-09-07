@@ -1,6 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { userService, User } from '../services/UserService';
 import CurrentTrends from './CurrentTrends';
+import CreateUser from './CreateUser';
 
 const getSeasonForDate = (dateValue: string): 'Spring' | 'Summer' | 'Fall' | 'Winter' => {
   const parsedDate = new Date(dateValue);
@@ -27,6 +28,8 @@ export default function UserPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [cardImage, setCardImage] = useState<string | null>(null);
+  const [pendingDeleteUser, setPendingDeleteUser] = useState<User | null>(null);
+  const deleteDialogRef = useRef<HTMLDialogElement | null>(null);
   const pageSize = 10;
 
   const getAllUsers = async () => {
@@ -124,7 +127,29 @@ export default function UserPage() {
     setSortDirection('asc');
   };
 
+  const openDeleteDialog = (user: User) => {
+    setPendingDeleteUser(user);
+    deleteDialogRef.current?.showModal();
+  };
 
+  const closeDeleteDialog = () => {
+    setPendingDeleteUser(null);
+    deleteDialogRef.current?.close();
+  };
+
+  const handleDeleteUser = async () => {
+    if (!pendingDeleteUser) {
+      return;
+    }
+
+    try {
+      await userService.deleteUser(pendingDeleteUser.id);
+      setUsers((currentUsers) => currentUsers.filter((user) => user.id !== pendingDeleteUser.id));
+    } catch (error) {
+      console.error('Error deleting user:', error);
+    }
+    closeDeleteDialog();
+  };
 
   return users.length > 0 ? (
     // this section could be its own component, but for simplicity, it's kept here
@@ -152,7 +177,7 @@ export default function UserPage() {
         <section className="panel panel-list">
           <div className="panel-header">
             <h2>User List</h2>
-            <span>{filteredUsers.length} total</span>
+            <CreateUser onUserCreated={getAllUsers} />
           </div>
 
           <label className="search-field">
@@ -163,6 +188,24 @@ export default function UserPage() {
               placeholder="Search by name, email, city, or role"
             />
           </label>
+
+          <dialog ref={deleteDialogRef} className="delete-confirmation-dialog">
+            {pendingDeleteUser && (
+              <>
+                <p>
+                  Delete {pendingDeleteUser.firstname} {pendingDeleteUser.lastname}?
+                </p>
+                <div className="dialog-actions">
+                  <button type="button" className="confirm-delete-button" onClick={handleDeleteUser}>
+                    Delete
+                  </button>
+                  <button type="button" className="cancel-delete-button" onClick={closeDeleteDialog}>
+                    Cancel
+                  </button>
+                </div>
+              </>
+            )}
+          </dialog>
 
           <div className="user-table-wrapper">
             <table className="user-table">
@@ -214,7 +257,7 @@ export default function UserPage() {
                         aria-label={`Delete ${user.firstname} ${user.lastname}`}
                         onClick={(event) => {
                           event.stopPropagation();
-                          console.log('Delete user', user.id);
+                          openDeleteDialog(user);
                         }}
                       >
                         <span className="material-symbols-outlined" aria-hidden="true">delete</span>
@@ -244,6 +287,9 @@ export default function UserPage() {
             >
               Next
             </button>
+            <span className="user-count">
+              {filteredUsers.length} users total
+            </span>
           </div>
 
           {selectedUser && (
