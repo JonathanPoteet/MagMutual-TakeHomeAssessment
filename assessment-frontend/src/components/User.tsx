@@ -303,12 +303,12 @@ export default function UserPage() {
                 {selectedUser.firstname} {selectedUser.lastname}
               </h3>
               <p>{selectedUser.email}</p>
-              <div className="user-meta">
-                <span>{selectedUser.country}</span>
-                <span>{selectedUser.city}</span>
-                <span>{selectedUser.profession}</span>
+              <div className="user-meta-list">
+                <div><strong>Country:</strong> {selectedUser.country}</div>
+                <div><strong>City:</strong> {selectedUser.city}</div>
+                <div><strong>Profession:</strong> {selectedUser.profession}</div>
+                <div><strong>Joined:</strong> {selectedUser.dateCreated}</div>
               </div>
-              <small>Joined: {selectedUser.dateCreated}</small>
             </div>
           )}
         </section>
