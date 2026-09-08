@@ -53,9 +53,9 @@ Tech Stack:
 
 Base features:
 
-· Endpoint to return all users (backend - done, Frontend - done)
+· Endpoint to return all users (backend - Done, Frontend - Done)
 
-· Endpoint to return a specific user (backend - done, Frontend - done)
+· Endpoint to return a specific user (backend - Done, Frontend - Done)
 
 · User information displayed on the frontend in a visually appealing way (Done)
 
