@@ -2,26 +2,32 @@ package com.jonathanpoteet.magmutual.assessment.assessment_backend.StartupHelper
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.sql.DataSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+
+import org.springframework.core.io.Resource;
 
 @Component
 public class StartupHelperService {
 
     private final JdbcTemplate jdbcTemplate;
+    private static final Logger log = LoggerFactory.getLogger(StartupHelperService.class);
 
     public StartupHelperService(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
@@ -30,17 +36,21 @@ public class StartupHelperService {
     public void seedDataIfEmpty() {
         // this is built of the assumption that the CSV file contains data that is validated and ready to be inserted into the database. 
         // If the CSV file is not validated, you should add validation logic here.
+        log.info("Checking if user data exists in the database...");
         Integer count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM users", Integer.class);
         if (count != null && count > 0) {
+            log.info("User data already exists in the database.");
             return;
         }
-
-        Path csvPath = resolveCsvPath();
-        if (Files.notExists(csvPath)) {
+        log.info("No user data found. Seeding initial data from UserInformation.csv...");
+       ClassPathResource resource = new ClassPathResource("UserInformation.csv");
+        if (!resource.exists()) {
+            log.warn("User information file not found.");
             return;
         }
-        List<Map<String, Object>> users = loadUsersFromCsv(csvPath);
+        List<Map<String, Object>> users = loadUsersFromResource(resource);
         if (users.isEmpty()) {
+            log.info("No user data to seed.");
             return;
         }
 
@@ -65,52 +75,49 @@ public class StartupHelperService {
             }
         });
     }
-    // parses the CSV file and returns a list of user data maps
-    private List<Map<String, Object>> loadUsersFromCsv(Path csvPath) {
-        try (BufferedReader reader = Files.newBufferedReader(csvPath, StandardCharsets.UTF_8)) {
-            String headerLine = reader.readLine();
-            if (headerLine == null || headerLine.isBlank()) {
-                return List.of();
-            }
-
-            List<String> headers = parseCsvLine(headerLine);
-            List<Map<String, Object>> users = new ArrayList<>();
-            String line;
-
-            while ((line = reader.readLine()) != null) {
-                if (line.isBlank()) {
-                    continue;
+            // parses the CSV file and returns a list of user data maps
+        private List<Map<String, Object>> loadUsersFromResource(Resource resource) {
+            try (Reader isr = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8);
+                BufferedReader reader = new BufferedReader(isr)) {
+                
+                String headerLine = reader.readLine();
+                if (headerLine == null || headerLine.isBlank()) {
+                    return List.of();
                 }
 
-                List<String> values = parseCsvLine(line);
-                Map<String, Object> user = new LinkedHashMap<>();
+                List<String> headers = parseCsvLine(headerLine);
+                List<Map<String, Object>> users = new ArrayList<>();
+                String line;
 
-                for (int i = 0; i < Math.min(headers.size(), values.size()); i++) {
-                    String key = headers.get(i).trim();
-                    String value = values.get(i).trim();
-                    if ("id".equalsIgnoreCase(key)) {
-                        user.put("id", Integer.parseInt(value));
-                    } else {
-                        user.put(key, value);
+                while ((line = reader.readLine()) != null) {
+                    if (line.isBlank()) {
+                        continue;
+                    }
+
+                    List<String> values = parseCsvLine(line);
+                    Map<String, Object> user = new LinkedHashMap<>();
+
+                    for (int i = 0; i < Math.min(headers.size(), values.size()); i++) {
+                        String key = headers.get(i).trim();
+                        String value = values.get(i).trim();
+                        if ("id".equalsIgnoreCase(key)) {
+                            user.put("id", Integer.parseInt(value));
+                        } else {
+                            user.put(key, value);
+                        }
+                    }
+
+                    if (!user.isEmpty()) {
+                        users.add(user);
                     }
                 }
 
-                if (!user.isEmpty()) {
-                    users.add(user);
-                }
+                return users;
+            } catch (IOException e) {
+                throw new IllegalStateException("Unable to read user CSV resource: " + resource.getFilename(), e);
             }
-
-            return users;
-        } catch (IOException e) {
-            throw new IllegalStateException("Unable to read user CSV from " + csvPath, e);
         }
-    }
 
-    //used to find the initial csv file to seed the database with user data
-    private Path resolveCsvPath() {
-        String workingDir = System.getProperty("user.dir");
-        return Path.of(workingDir, "..", "UserInformation.csv").normalize();
-    }
 
     // Parses a single CSV line into a list of values, handling quoted values and commas within quotes
     private List<String> parseCsvLine(String line) {

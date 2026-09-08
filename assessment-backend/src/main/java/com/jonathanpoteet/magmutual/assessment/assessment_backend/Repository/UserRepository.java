@@ -6,6 +6,8 @@ import java.nio.file.Path;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 
@@ -21,6 +23,7 @@ public class UserRepository {
 
     private final JdbcTemplate jdbcTemplate;
     private final StartupHelperService startupHelperService;
+    private static final Logger log = LoggerFactory.getLogger(UserRepository.class); 
 
     public UserRepository(DataSource dataSource, StartupHelperService startupHelperService) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
@@ -82,10 +85,13 @@ public class UserRepository {
     }
 
     private void initializeDatabase() {
-        Path dataDirectory = Path.of(System.getProperty("user.dir"), "data");
+        log.info("Initializing SQLite database at /data/users.db...");
+        Path dataDirectory = Path.of("/data");
         try {
             Files.createDirectories(dataDirectory);
+            log.debug("Verified database directory existence: {}", dataDirectory.toAbsolutePath());
         } catch (IOException e) {
+            log.error("Failed to create SQLite data directory at /data", e);
             throw new IllegalStateException("Unable to create SQLite data directory", e);
         }
 
@@ -101,7 +107,10 @@ public class UserRepository {
                 city TEXT
             )
         """);
+        log.info("Successfully checked/created 'users' table schema.");
 
+        log.info("Checking and seeding initial user data if empty...");
         startupHelperService.seedDataIfEmpty();
+        log.info("Database initialization complete.");
     }
 }
