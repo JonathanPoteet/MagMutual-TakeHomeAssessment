@@ -67,7 +67,7 @@ Optional features (choose at least 2 of the 4):
 
 3. Create a custom endpoint of your own to transform or visualize the data in a different way. This should also include a corresponding frontend component/display. (Done)
 
-4. Create an ERD that shows how you would go about accommodating the following user request: (WIP)
+4. Create an ERD that shows how you would go about accommodating the following user request: (done)
 
     - Request: HR needs to associate users with various Companies. Can you model what the data would look like?
 
@@ -89,7 +89,7 @@ Deliverables:
 
 · Be prepared to demo & discuss your work
 
-
+ERD Markdown link: [ERD_Companies.md](ERD_Companies.md)
 
 Out of Scope
 - Caching
