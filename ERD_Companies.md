@@ -49,6 +49,6 @@ erDiagram
         date start_date
         date end_date
     }
-    ```
+```
 
-    Additional attributes may be added to the EMPLOYEES association table as needed, such as `manager_id`, `company_role`, and `pay_level`
+Additional attributes may be added to the EMPLOYEES association table as needed, such as `manager_id`, `company_role`, and `pay_level`.
