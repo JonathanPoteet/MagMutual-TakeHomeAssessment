@@ -91,6 +91,8 @@ Deliverables:
 
 ERD Markdown link: [ERD_Companies.md](ERD_Companies.md)
 
+Demo video: [Small demo video](https://youtu.be/nsECgY3QUW0)
+
 Out of Scope
 - Caching
 - Authentication
