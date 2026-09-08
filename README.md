@@ -5,7 +5,7 @@
 ### Prerequisites
 - Java 21
 - Maven
-- Node.js 20+
+- Node.js 21+
 - Docker Desktop or Docker Engine (if running with docker)
 
 ### Run locally without Docker
